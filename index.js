@@ -53,7 +53,7 @@ function formFunction(event) {
   alert('Login successful! Redirecting to dashboard...');
   
   // Verified route: Aapke application server dashboard ya calculator page redirection url
-  window.location.href = 'https://github.io'; 
+  window.location.href = 'https://oxanuragofficial.github.io/web-calculator/'; 
 }
 
 document.addEventListener('DOMContentLoaded', function() {
