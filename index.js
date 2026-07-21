@@ -32,17 +32,31 @@ function formFunction(event) {
   // 4. LocalStorage se user database fetch karna
   let registeredUsers = JSON.parse(localStorage.getItem('users')) || [];
 
-  // 5. Verification: Check karein ki user email registered list me maujood hai ya nahi
-  let userExists = registeredUsers.some(user => user.email === email);
+  // 👉 FIXED: pure array me exact user object ko find karein (Email match karne ke liye)
+  let foundUser = registeredUsers.find(user => user.email === email);
 
-  if (!userExists) {
-    // Agar user database me nahi hai, toh red screen banner dikhayein
+  // 5. Verification: Check karein ki user email registered list me hai ya nahi
+  if (!foundUser) {
+    // Agar user database me nahi hai, toh red screen banner default innerHTML ke sath dikhayein
     if (errorAlert) {
+      errorAlert.innerHTML = 'User not found! Please <a href="register.html" style="color: #d91e1e; font-weight: bold; text-decoration: underline;">Register First</a>.';
       errorAlert.style.display = 'block';
     } else {
       alert('User not found! Please register first.');
     }
-    return; // execution ko aage badhne se rokein
+    return; 
+  }
+  
+  // 👉 ADDED LOGIC: Ab check karein ki password sahi hai ya nahi
+  if (foundUser.password !== password) {
+    if (errorAlert) {
+      // Error message ko password warning me change karein
+      errorAlert.innerHTML = 'Incorrect Password! Please try again.';
+      errorAlert.style.display = 'block';
+    } else {
+      alert('Incorrect Password! Please try again.');
+    }
+    return; // Wrong password hone par code ko aage badhne se rokein
   }
   
   // Console logging information
@@ -50,6 +64,11 @@ function formFunction(event) {
   console.log('Password:', password);
   console.log('Remember me:', remember);
   
+  // Optional: Remember me true hone par active login status save karein
+  if (remember) {
+    localStorage.setItem('isLoggedIn', 'true');
+  }
+
   alert('Login successful! Redirecting to dashboard...');
   
   // Verified route: Aapke application server dashboard ya calculator page redirection url
@@ -62,12 +81,21 @@ document.addEventListener('DOMContentLoaded', function() {
     form.onsubmit = formFunction;
   }
 
-  // Input listener: Jaise hi user wapas typing shuru kare, red error banner hide ho jaye
+  // Input listener: Jaise hi user wapas typing shuru kare (Email ya Password), red error banner hide ho jaye
   const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
   const errorAlert = document.getElementById('errorAlert');
-  if (emailInput && errorAlert) {
-    emailInput.addEventListener('input', function() {
-      errorAlert.style.display = 'none';
-    });
+  
+  if (errorAlert) {
+    if (emailInput) {
+      emailInput.addEventListener('input', function() {
+        errorAlert.style.display = 'none';
+      });
+    }
+    if (passwordInput) {
+      passwordInput.addEventListener('input', function() {
+        errorAlert.style.display = 'none';
+      });
+    }
   }
 });
